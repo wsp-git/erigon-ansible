@@ -1,0 +1,13 @@
+---
+# tasks file for deploy-eth
+
+- name: Copy job file
+  template:
+    src: "tgeth.nomad.j2"
+    dest: "{{ bin_path }}/tgeth.nomad"
+    owner: root
+    group: root
+    force: yes
+
+- name: run job
+  command: nomad job run {{ bin_path }}/tgeth.nomad

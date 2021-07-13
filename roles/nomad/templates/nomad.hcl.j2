@@ -1,0 +1,26 @@
+datacenter = "dc1"
+data_dir  = "/var/lib/nomad"
+bind_addr = "0.0.0.0"
+
+server {
+  enabled          = true
+  bootstrap_expect = 1
+}
+
+client {
+  enabled = true
+
+  host_volume "data" {
+    path      = "/ethdata"
+    read_only = false
+  }
+}
+
+plugin "docker" {
+  config {
+    volumes {
+      enabled      = true
+      selinuxlabel = "z"
+    }
+  }
+}
