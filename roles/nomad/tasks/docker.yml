@@ -32,8 +32,3 @@
   apt: name={{ item }} state=latest update_cache=yes
   loop: [ 'docker-ce', 'docker-ce-cli', 'containerd.io']
   become: yes
-
-- name: Install Docker Module for Python
-  pip:
-    name: docker
-  become: yes
