@@ -7,11 +7,24 @@
     name: "{{ hostname }}"
 
 # Network configuration
-- name: enable network interface and set ip
+- name: check network
   shell: |
-    ip a add 192.168.1.2/24 dev ens4 && ip link set ens4 up
-  become: yes
+    ip link show ens4
+  register: net_status
+  ignore_errors: true
 
+- name: provide IP if not yet
+  shell: |
+    ip a add 192.168.1.2/24 dev ens4
+  become: yes
+  when: "'192.168.1.2' not in net_status.stdout"
+
+- name: enable ens4 if not yet
+  shell: |
+    ip link set ens4 up
+  become: yes
+  when: "'UP' not in net_status.stdout"
+ 
 # Disk configuration for ETH data
 - name: Check if already done
   stat:
