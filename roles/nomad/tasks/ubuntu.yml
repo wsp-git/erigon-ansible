@@ -44,10 +44,39 @@
     dest: "{{ cni_folder }}"
     remote_src: true
 
+# prepare docker
+- name: check if docker is installed
+  shell: "which docker"
+  register: result
+  ignore_errors: true
+
+- fail:
+    msg: "Docker not installed"
+  when: result.rc != 0
+  ignore_errors: true
+
+# install dockers if not found
+- include: docker.yml
+  when: result.rc != 0
+
+- name: adding existing user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+  become: yes
+
+- name: reset ssh connection to allow user changes to affect 'current login user'
+  meta: reset_connection
+
 - name: Start nomad service
   systemd:
     daemon_reload: yes
-    state: restarted
+    state: started
     enabled: yes
     name: nomad.service
 
+- name: Wait for port 4646 open on the host, don't start checking for 10 seconds
+  wait_for:
+    port: 4646
+    delay: 10
