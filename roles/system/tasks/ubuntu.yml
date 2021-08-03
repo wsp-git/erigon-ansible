@@ -7,18 +7,10 @@
     name: "{{ hostname }}"
 
 # Network configuration
-- name: set private interface configuration
-  template:
-    src: private.yml.j2
-    dest: "{{ private_ip_config }}"
-    owner: root
-    group: root
-    mode: 0644
-
-- name: netplan config apply
-  command: netplan apply
-  async: 100
-  poll: 0
+- name: enable network interface and set ip
+  shell: |
+    ip a add 192.168.1.2/24 dev ens4 && ip link set ens4 up
+  become: yes
 
 # Disk configuration for ETH data
 - name: Check if already done
